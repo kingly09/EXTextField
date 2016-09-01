@@ -90,7 +90,7 @@ static char exKeyboardFrameBeginToEndKey;
  *  接收键盘的显示的通知
  **/
 - (void)notificationShowKeyboardAction:(NSNotification *)sender {
-       NSLog(@"%@", sender);
+//       NSLog(@"%@", sender);
     if (!self.ex_canMove) {
         return;
     }
@@ -101,7 +101,6 @@ static char exKeyboardFrameBeginToEndKey;
     CGRect end = [[[sender userInfo] objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
     CGFloat duration = [[sender.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue];
     if ((begins.origin.y-end.origin.y<0) && duration == 0){
-        
         self.exKeyboardFrameBeginToEnd = begins.origin.y - end.origin.y;
     }else{
         self.exKeyboardFrameBeginToEnd  = 0;
@@ -115,14 +114,13 @@ static char exKeyboardFrameBeginToEndKey;
     }
     CGFloat fieldYInWindow = [self convertPoint:self.bounds.origin toView:[UIApplication sharedApplication].keyWindow].y;
     CGFloat height = (fieldYInWindow + self.ex_heightToKeyboard + self.frame.size.height) - self.exKeyboardY;
-    
-   
- 
     CGFloat moveHeight = height > 0 ? height : 0;
     moveHeight = self.exKeyboardFrameBeginToEnd < 0?self.exKeyboardFrameBeginToEnd:moveHeight;
-    
-     NSLog(@"fieldYInWindow :: %f, self.frame.size.height %f , self.exKeyboardY %f",fieldYInWindow,self.frame.size.height,self.exKeyboardY);
-    
+    if (height < 0  && moveHeight < 0) {
+        if (fabs(height)>fabs(moveHeight)) {
+            return;
+        }
+    }
     [UIView animateWithDuration:0.25 animations:^{
         if (self.exhasContentOffset) {
             UIScrollView *scrollView = (UIScrollView *)self.ex_moveView;
